@@ -22,7 +22,7 @@ if sys.version_info[0] < 3:
         DeprecationWarning
     )
 
-VERSION = '2.3.4-dev'
+VERSION = '2.3.4-dev-pyx'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -102,6 +102,25 @@ if LDAP_CONFIGURED:
             "LDAP authentication has been configured, but django-auth-ldap is not installed. You can remove "
             "netbox/ldap_config.py to disable LDAP."
         )
+
+try:
+    from netbox.saml_config import *
+    SAML_CONFIGURED = True
+except ImportError:
+    SAML_CONFIGURED = False
+
+# LDAP configuration (optional)
+if SAML_CONFIGURED:
+    try:
+        # Add auth backend
+        AUTHENTICATION_BACKENDS = [
+            'saml_service_provider.auth_backend.SAMLServiceProviderBackend',
+        ]
+    except ImportError:
+        raise ImproperlyConfigured(
+            "SAML authentication has been configured, but saml_service_provider is not installed. You can remove netbox/saml_config.py to disable OneLogin SAML."
+        )
+
 
 # Database
 configuration.DATABASE.update({'ENGINE': 'django.db.backends.postgresql'})

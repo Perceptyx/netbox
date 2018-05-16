@@ -62,6 +62,8 @@ _patterns = [
     # Admin
     url(r'^admin/', admin.site.urls),
 
+    # SAML Login using OneLogin
+    url(r'^saml/', include('saml_service_provider.urls')),
 ]
 
 if settings.DEBUG:
